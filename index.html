@@ -21,26 +21,25 @@
       border-radius: 8px;
       box-shadow: 0 0 8px rgba(0,0,0,0.1);
     }
-    .card label {
-      display: block;
-      margin-bottom: 1em;
-    }
-    .card input,
-    .card select {
+    /* tutti i label tranne .checkbox-label rimangono block */
+    .cardlabel,
+    .card select,
+    .card input {
       width: 100%;
       padding: 8px;
       box-sizing: border-box;
+      margin-bottom: 1em;
     }
-    /* checkbox e testo affiancati */
-    .checkbox-label {
-      display: flex;
+    /* qui override per la checkbox */
+    .card .checkbox-label {
+      display: flex !important;
       align-items: center;
       margin-bottom: 1em;
     }
     .checkbox-label input {
       margin-right: 8px;
     }
-    /* bottone grande */
+    /* pulsante più grande */
     .card button {
       width: 100%;
       background: #336699;
@@ -78,32 +77,31 @@
   <h2>🎓 Preventivo Stampa Tesi</h2>
   <div class="card">
     <form onsubmit="return false;">
-      <label>
-        📂 Carica PDF della tesi:
+      <label class="cardlabel">📂 Carica PDF:
         <input type="file" id="pdfFile" accept="application/pdf" required>
       </label>
-      <label>
-        🧮 Numero di copie:
+      <label class="cardlabel">🧮 Numero di copie:
         <input type="number" id="copie" value="1" min="1">
       </label>
-      <label>
-        📘 Tipo di copertina:
+      <label class="cardlabel">📘 Tipo di copertina:
         <select id="copertina">
           <option value="0">Similpelle (inclusa)</option>
           <option value="5">Tela/Seta (+€5)</option>
         </select>
       </label>
-      <label>
-        📑 Stampa:
+      <label class="cardlabel">📑 Stampa:
         <select id="frontalita">
           <option value="0.03">Solo fronte (+€0,03/pagina)</option>
           <option value="0">Fronte/Retro</option>
         </select>
       </label>
+
+      <!-- checkbox AFFIANCATA -->
       <label class="checkbox-label">
         <input type="checkbox" id="dorso">
         🏷️ Titolo sul dorso (+€6,50 per copia)
       </label>
+
       <button id="btnCalc">Calcola Preventivo</button>
     </form>
 
@@ -132,44 +130,44 @@
       for (let i = 1; i <= tot; i++) {
         const pg = await pdf.getPage(i);
         const vp = pg.getViewport({ scale: 1 });
-        const cnv = document.createElement('canvas');
-        cnv.width = vp.width; cnv.height = vp.height;
-        await pg.render({ canvasContext: cnv.getContext('2d'), viewport: vp }).promise;
+        const cv = document.createElement('canvas');
+        cv.width = vp.width; cv.height = vp.height;
+        await pg.render({ canvasContext: cv.getContext('2d'), viewport: vp }).promise;
 
-        const dat = cnv.getContext('2d').getImageData(0,0,cnv.width,cnv.height).data;
-        let isColor = false;
-        for (let p = 0; p < dat.length; p += 4) {
-          if (dat[p]!==dat[p+1] || dat[p+1]!==dat[p+2]) { isColor = true; break; }
+        const d = cv.getContext('2d').getImageData(0,0,cv.width,cv.height).data;
+        let isC = false;
+        for (let p = 0; p < d.length; p += 4) {
+          if (d[p]!==d[p+1] || d[p+1]!==d[p+2]) { isC = true; break; }
         }
-        isColor?col++:bn++;
+        isC? col++: bn++;
         updateProgress(i, tot);
       }
 
-      // Calcolo prezzi
+      // calcolo preventivo
       const copie    = +document.getElementById('copie').value;
       const copVal   = +document.getElementById('copertina').value;
-      const extra    = +document.getElementById('frontalita').value;
+      const extraF   = +document.getElementById('frontalita').value;
       const hasDorso = document.getElementById('dorso').checked;
-      let basePrice  = copie === 1 ? 35 : (copie === 2 ? 27.5 : 22.5);
-      const costBase   = basePrice * copie;
-      const costCover  = copVal * copie;
-      const costBN     = bn * (0.07 + extra) * copie;
-      const costColor  = col * (0.50 + extra) * copie;
-      const costDorso  = hasDorso ? 6.5 * copie : 0;
-      const totalCost  = costBase + costCover + costBN + costColor + costDorso;
-      const perCopy    = totalCost / copie;
+      const base     = copie===1?35: copie===2?27.5:22.5;
+      const costBase = base * copie;
+      const costCop  = copVal * copie;
+      const costBN   = bn * (0.07 + extraF) * copie;
+      const costCol  = col * (0.50 + extraF) * copie;
+      const costDr   = hasDorso ? 6.5 * copie : 0;
+      const totCost  = costBase + costCop + costBN + costCol + costDr;
+      const perC     = totCost / copie;
 
       document.getElementById('risultato').innerHTML = `
         <strong>🧾 Riepilogo Preventivo</strong><br><br>
         📄 Pagine B/N: ${bn}<br>
         🎨 Pagine a colori: ${col}<br><br>
-        📦 Prezzo base: €${basePrice.toFixed(2)} × ${copie} = <strong>€${costBase.toFixed(2)}</strong><br>
-        📘 Copertina: €${copVal.toFixed(2)} × ${copie} = €${costCover.toFixed(2)}<br>
-        🖨️ Stampa B/N: €${(0.07+extra).toFixed(2)} × ${bn} × ${copie} = €${costBN.toFixed(2)}<br>
-        🎨 Stampa colori: €${(0.50+extra).toFixed(2)} × ${col} × ${copie} = €${costColor.toFixed(2)}<br>
-        ${hasDorso ? `🏷️ Dorso: €6,50 × ${copie} = €${costDorso.toFixed(2)}<br>` : ''}
-        <br><strong>💰 Totale: €${totalCost.toFixed(2)}</strong><br>
-        <strong>📊 Per copia: €${perCopy.toFixed(2)}</strong>
+        📦 Prezzo base: €${base.toFixed(2)}×${copie}=€${costBase.toFixed(2)}<br>
+        📘 Copertina: €${copVal.toFixed(2)}×${copie}=€${costCop.toFixed(2)}<br>
+        🖨️ B/N: €${(0.07+extraF).toFixed(2)}×${bn}×${copie}=€${costBN.toFixed(2)}<br>
+        🎨 Colori: €${(0.50+extraF).toFixed(2)}×${col}×${copie}=€${costCol.toFixed(2)}<br>
+        ${hasDorso?`🏷️ Dorso: €6,50×${copie}=€${costDr.toFixed(2)}<br>`:''}
+        <br><strong>💰 Totale: €${totCost.toFixed(2)}</strong><br>
+        <strong>📊 Per copia: €${perC.toFixed(2)}</strong>
       `;
       document.getElementById('progressContainer').style.display = 'none';
     };
@@ -177,7 +175,8 @@
     function updateProgress(page, total, txt) {
       const pct = Math.round((page/total)*100);
       document.getElementById('progressBar').style.width = pct + '%';
-      document.getElementById('progressText').innerText = txt || `Pagina ${page} di ${total} (${pct}%)`;
+      document.getElementById('progressText').innerText = txt
+        || `Pagina ${page} di ${total} (${pct}%)`;
     }
   </script>
 </body>
