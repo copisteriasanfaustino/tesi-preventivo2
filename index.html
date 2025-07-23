@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Preventivo Tesi</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.12.313/pdf.min.js"></script>
+  <style>
+    body { font-family:sans-serif; max-width:600px; margin:2em auto; }
+    h2 { text-align:center; color:#2a4d7a; }
+    .card { background:#f9f9f9; padding:20px; border-radius:8px; box-shadow:0 0 8px rgba(0,0,0,0.1); }
+    .card label, .card button { display:block; width:100%; margin-bottom:1em; }
+    .card input, .card select { width:100%; padding:8px; }
+    .card button { background:#336699; color:#fff; border:none; border-radius:4px; cursor:pointer; }
+    #progressBar { width:0; height:8px; background:#336699; transition:width .2s; }
+    #progressContainer { display:none; background:#eee; border-radius:4px; overflow:hidden; margin-bottom:1em; }
+    #risultato { background:#eef6ff; padding:15px; border-radius:6px; font-size:1.1em; }
+  </style>
+</head>
+<body>
+  <h2>🎓 Preventivo Stampa Tesi</h2>
+  <div class="card">
+    <form onsubmit="return false;">
+      <label>📂 Carica PDF:
+        <input type="file" id="pdfFile" accept="application/pdf" required>
+      </label>
+      <label>🧮 Copie:
+        <input type="number" id="copie" value="1" min="1">
+      </label>
+      <label>📘 Copertina:
+        <select id="copertina">
+          <option value="0">Similpelle (inclusa)</option>
+          <option value="5">Tela/Seta (+€5)</option>
+        </select>
+      </label>
+      <label>📑 Stampa:
+        <select id="frontalita">
+          <option value="0.03">Solo fronte (+€0,03/pagina)</option>
+          <option value="0">Fronte/Retro</option>
+        </select>
+      </label>
+      <label>
+        <input type="checkbox" id="dorso"> 🏷️ Titolo sul dorso (+€6,50/copia)
+      </label>
+      <button id="btnCalc">Calcola Preventivo</button>
+    </form>
+    <div id="progressContainer">
+      <div id="progressBar"></div>
+      <div id="progressText" style="margin-top:4px; font-size:.9em;"></div>
+    </div>
+    <div id="risultato"></div>
+  </div>
+  <script>
+    pdfjsLib.GlobalWorkerOptions.workerSrc =
+      'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.12.313/pdf.worker.min.js';
+
+    document.getElementById('btnCalc').onclick = async () => {
+      const f = document.getElementById('pdfFile');
+      if (!f.files.length) return alert('Carica un PDF.');
+      document.getElementById('risultato').innerHTML = '';
+      document.getElementById('progressContainer').style.display = 'block';
+      updateProgress(0,1,'Avvio…');
+
+      const buf = await f.files[0].arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+      let bn=0, col=0, tot=pdf.numPages;
+
+      for (let i=1; i<=tot; i++) {
+        const pg = await pdf.getPage(i);
+        const vp = pg.getViewport({ scale:1 });
+        const cnv = document.createElement('canvas');
+        cnv.width = vp.width; cnv.height = vp.height;
+        await pg.render({ canvasContext:cnv.getContext('2d'), viewport:vp }).promise;
+        const d = cnv.getContext('2d').getImageData(0,0,cnv.width,cnv.height).data;
+        let isCol=false;
+        for (let p=0; p<d.length; p+=4) {
+          if (d[p]!==d[p+1]||d[p+1]!==d[p+2]) { isCol=true; break; }
+        }
+        isCol?col++:bn++;
+        updateProgress(i,tot);
+      }
+
+      // calcolo
+      const copie   = +document.getElementById('copie').value;
+      const copVal  = +document.getElementById('copertina').value;
+      const extra   = +document.getElementById('frontalita').value;
+      const dorso   = document.getElementById('dorso').checked;
+      let base=35; if(copie===2)base=27.5; if(copie>=3)base=22.5;
+      const costBase = base*copie;
+      const costCop  = copVal*copie;
+      const costBN   = bn*(0.07+extra)*copie;
+      const costCol  = col*(0.50+extra)*copie;
+      const costDr   = dorso?6.5*copie:0;
+      const totCost  = costBase+costCop+costBN+costCol+costDr;
+      const perC     = totCost/copie;
+
+      document.getElementById('risultato').innerHTML = `
+        <strong>🧾 Riepilogo</strong><br><br>
+        📄 B/N: ${bn}<br>
+        🎨 Colori: ${col}<br><br>
+        📦 Base: €${base.toFixed(2)}×${copie}=€${costBase.toFixed(2)}<br>
+        📘 Copertina: €${copVal.toFixed(2)}×${copie}=€${costCop.toFixed(2)}<br>
+        🖨️ B/N: €${(0.07+extra).toFixed(2)}×${bn}×${copie}=€${costBN.toFixed(2)}<br>
+        🎨 Colori: €${(0.50+extra).toFixed(2)}×${col}×${copie}=€${costCol.toFixed(2)}<br>
+        ${dorso?`🏷️ Dorso: €6,50×${copie}=€${costDr.toFixed(2)}<br>`:''}
+        <br><strong>💰 Totale: €${totCost.toFixed(2)}</strong><br>
+        <strong>📊 A copia: €${perC.toFixed(2)}</strong>
+      `;
+      document.getElementById('progressContainer').style.display = 'none';
+    };
+
+    function updateProgress(p, t, txt) {
+      const pct = Math.round((p/t)*100);
+      document.getElementById('progressBar').style.width = pct + '%';
+      document.getElementById('progressText').innerText = txt||`Pagina ${p} di ${t} (${pct}%)`;
+    }
+  </script>
+</body>
+</html>
