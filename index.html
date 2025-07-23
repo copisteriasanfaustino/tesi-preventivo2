@@ -21,7 +21,7 @@
       border-radius: 8px;
       box-shadow: 0 0 8px rgba(0,0,0,0.1);
     }
-    .card label:not(.checkbox-label) {
+    .card label:not(.checkbox-table) {
       display: block;
       margin-bottom: 1em;
     }
@@ -31,18 +31,7 @@
       padding: 8px;
       box-sizing: border-box;
     }
-    /* checkbox e testo affiancati sul margine sinistro */
-    .checkbox-label {
-      display: flex !important;
-      align-items: center;
-      justify-content: flex-start !important;
-      text-align: left !important;
-      margin-bottom: 1em;
-    }
-    .checkbox-label input {
-      margin-right: 8px;
-    }
-    /* pulsante più grande */
+    /* Pulsante grande */
     .card button {
       width: 100%;
       background: #336699;
@@ -52,6 +41,7 @@
       padding: 14px 0;
       font-size: 1.1em;
       cursor: pointer;
+      margin-top: 0.5em;
     }
     #progressContainer {
       display: none;
@@ -97,16 +87,22 @@
           <option value="0">Fronte/Retro</option>
         </select>
       </label>
-<label style="display:flex; align-items:center; margin-bottom:1em; text-align:left;">
-  <input
-    type="checkbox"
-    id="dorso"
-    style="margin:0 8px 0 0; flex-shrink:0;"
-  />
-  <span>🏷️ Titolo sul dorso (+€6,50 per copia)</span>
-</label>
+
+      <!-- checkbox affiancata a sinistra tramite tabella -->
+      <table class="checkbox-table" style="width:100%; border:none; margin-bottom:1em; border-collapse:collapse;">
+        <tr>
+          <td style="padding:0; border:none; width:auto; vertical-align:middle;">
+            <input type="checkbox" id="dorso">
+          </td>
+          <td style="padding:0 0 0 8px; border:none; text-align:left; vertical-align:middle;">
+            🏷️ Titolo sul dorso (+€6,50 per copia)
+          </td>
+        </tr>
+      </table>
+
       <button id="btnCalc">Calcola Preventivo</button>
     </form>
+
     <div id="progressContainer">
       <div id="progressBar"></div>
       <div id="progressText" style="font-size:.9em; padding:4px;"></div>
@@ -139,8 +135,9 @@
         const data = cv.getContext('2d').getImageData(0,0,cv.width,cv.height).data;
         let isColor = false;
         for (let p = 0; p < data.length; p += 4) {
-          if (data[p]!==data[p+1] || data[p+1]!==data[p+2]) {
-            isColor = true; break;
+          if (data[p] !== data[p+1] || data[p+1] !== data[p+2]) {
+            isColor = true;
+            break;
           }
         }
         isColor ? col++ : bn++;
@@ -151,7 +148,7 @@
       const copVal   = +document.getElementById('copertina').value;
       const extraF   = +document.getElementById('frontalita').value;
       const hasDorso = document.getElementById('dorso').checked;
-      const base     = copie===1 ? 35 : (copie===2 ? 27.5 : 22.5);
+      const base     = copie === 1 ? 35 : (copie === 2 ? 27.5 : 22.5);
       const costBase = base * copie;
       const costCop  = copVal * copie;
       const costBN   = bn * (0.07 + extraF) * copie;
@@ -176,9 +173,10 @@
     };
 
     function updateProgress(page, total, txt) {
-      const pct = Math.round((page/total)*100);
+      const pct = Math.round((page/total) * 100);
       document.getElementById('progressBar').style.width = pct + '%';
-      document.getElementById('progressText').innerText = txt 
-        || `Pagina ${page} di ${total} (${pct}%)`;
+      document.getElementById('progressText').innerText = txt || `Pagina ${page} di ${total} (${pct}%)`;
     }
   </script>
+</body>
+</html>
