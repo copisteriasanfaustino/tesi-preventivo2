@@ -12,25 +12,31 @@
       padding: 0;
     }
     html, body {
-      height: auto;
-      overflow-y: auto;
+      height: 100%;
+      overflow-x: hidden;
       font-family: sans-serif;
-      background: #fff;
+      background-color: #fff;
     }
     body {
-      max-width: 600px;
-      margin: 2em auto 0 auto;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+      padding-top: 2em;
     }
     h2 {
-      text-align: center;
       color: #2a4d7a;
       margin-bottom: 1em;
+      text-align: center;
     }
     .card {
       background: #f9f9f9;
       padding: 20px;
       border-radius: 8px;
       box-shadow: 0 0 8px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 600px;
+      flex-shrink: 0;
     }
     .card label:not(.checkbox-table) {
       display: block;
@@ -71,9 +77,6 @@
       border-radius: 6px;
       font-size: 1.1em;
       margin-top: 1em;
-    }
-    .card:last-child {
-      margin-bottom: 0;
     }
   </style>
 </head>
@@ -174,7 +177,7 @@
         🖨️ Stampa B/N: €${(0.07+extraF).toFixed(2)} × ${bn} × ${copie} = €${costBN.toFixed(2)}<br>
         🎨 Stampa colori: €${(0.50+extraF).toFixed(2)} × ${col} × ${copie} = €${costCol.toFixed(2)}<br>
         ${hasDorso ? `🏷️ Dorso: €6,50 × ${copie} = €${costDr.toFixed(2)}<br>` : ''}
-        <br><strong>💰 Totale: €${totalCost.toFixed(2)}</strong><br>
+        <strong>💰 Totale: €${totalCost.toFixed(2)}</strong><br>
         <strong>📊 Per copia: €${perCopy.toFixed(2)}</strong>
       `;
       document.getElementById('progressContainer').style.display = 'none';
