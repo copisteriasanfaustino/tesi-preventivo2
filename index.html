@@ -2,13 +2,16 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1"> <!-- Ottimizzazione mobile -->
   <title>Preventivo Stampa Tesi</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.12.313/pdf.min.js"></script>
   <style>
-    body {
+    html, body {
+      margin: 0;
+      padding: 0;
       font-family: sans-serif;
       max-width: 600px;
-      margin: 2em auto;
+      margin: 2em auto 0 auto;
     }
     h2 {
       text-align: center;
@@ -20,6 +23,7 @@
       padding: 20px;
       border-radius: 8px;
       box-shadow: 0 0 8px rgba(0,0,0,0.1);
+      margin-bottom: 0;
     }
     .card label:not(.checkbox-table) {
       display: block;
@@ -31,7 +35,6 @@
       padding: 8px;
       box-sizing: border-box;
     }
-    /* Pulsante grande */
     .card button {
       width: 100%;
       background: #336699;
@@ -63,6 +66,10 @@
       font-size: 1.1em;
       margin-top: 1em;
     }
+    html, body {
+      height: auto;
+      overflow-y: auto;
+    }
   </style>
 </head>
 <body>
@@ -87,8 +94,6 @@
           <option value="0">Fronte/Retro</option>
         </select>
       </label>
-
-      <!-- checkbox affiancata a sinistra tramite tabella -->
       <table class="checkbox-table" style="width:100%; border:none; margin-bottom:1em; border-collapse:collapse;">
         <tr>
           <td style="padding:0; border:none; width:auto; vertical-align:middle;">
