@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Preventivo Stampa Tesi</title>
+  <title>Preventivo Tesi</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.12.313/pdf.min.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -107,15 +107,6 @@
     pdfjsLib.GlobalWorkerOptions.workerSrc =
       "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.12.313/pdf.worker.min.js";
 
-    function sendHeight() {
-      const h = document.body.scrollHeight;
-      window.parent.postMessage({ type: "setHeight", height: h }, "*");
-    }
-
-    window.addEventListener("load", sendHeight);
-    window.addEventListener("resize", sendHeight);
-    new MutationObserver(sendHeight).observe(document.body, { childList: true, subtree: true });
-
     document.getElementById("btnCalc").onclick = async () => {
       const f = document.getElementById("pdfFile");
       if (!f.files.length) return alert("Carica un file PDF.");
@@ -178,7 +169,6 @@
 
       risultato.style.display = "block";
       document.getElementById("progressContainer").style.display = "none";
-      sendHeight();
     };
 
     function updateProgress(page, total, txt) {
