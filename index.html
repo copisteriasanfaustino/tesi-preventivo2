@@ -2,14 +2,22 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1"> <!-- Ottimizzazione mobile -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Preventivo Stampa Tesi</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.12.313/pdf.min.js"></script>
   <style>
-    html, body {
+    * {
+      box-sizing: border-box;
       margin: 0;
       padding: 0;
+    }
+    html, body {
+      height: auto;
+      overflow-y: auto;
       font-family: sans-serif;
+      background: #fff;
+    }
+    body {
       max-width: 600px;
       margin: 2em auto 0 auto;
     }
@@ -23,7 +31,6 @@
       padding: 20px;
       border-radius: 8px;
       box-shadow: 0 0 8px rgba(0,0,0,0.1);
-      margin-bottom: 0;
     }
     .card label:not(.checkbox-table) {
       display: block;
@@ -33,7 +40,6 @@
     .card select {
       width: 100%;
       padding: 8px;
-      box-sizing: border-box;
     }
     .card button {
       width: 100%;
@@ -66,9 +72,8 @@
       font-size: 1.1em;
       margin-top: 1em;
     }
-    html, body {
-      height: auto;
-      overflow-y: auto;
+    .card:last-child {
+      margin-bottom: 0;
     }
   </style>
 </head>
@@ -104,10 +109,8 @@
           </td>
         </tr>
       </table>
-
       <button id="btnCalc">Calcola Preventivo</button>
     </form>
-
     <div id="progressContainer">
       <div id="progressBar"></div>
       <div id="progressText" style="font-size:.9em; padding:4px;"></div>
