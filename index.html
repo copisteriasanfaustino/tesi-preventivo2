@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Preventivo Stampa Tesi</title>
+  <title>Preventivo Tesi</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.12.313/pdf.min.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -183,7 +183,4 @@
       sendHeight();
     };
 
-    function updateProgress(page, total, txt) {
-      const pct = Math.round((page / total) * 100);
-      document.getElementById("progressBar").style.width = pct + "%";
-      document.getElementById("progressText").innerText
+    function updateProgress(page,
