@@ -15,14 +15,13 @@
       height: 100%;
       overflow-x: hidden;
       font-family: sans-serif;
-      background-color: #fff;
+      background: #fff;
     }
     body {
       display: flex;
       flex-direction: column;
-      justify-content: flex-start;
       align-items: center;
-      padding-top: 2em;
+      padding: 2em 1em 0 1em;
     }
     h2 {
       color: #2a4d7a;
@@ -36,7 +35,6 @@
       box-shadow: 0 0 8px rgba(0,0,0,0.1);
       width: 100%;
       max-width: 600px;
-      flex-shrink: 0;
     }
     .card label:not(.checkbox-table) {
       display: block;
@@ -77,6 +75,7 @@
       border-radius: 6px;
       font-size: 1.1em;
       margin-top: 1em;
+      margin-bottom: 0;
     }
   </style>
 </head>
@@ -172,7 +171,7 @@
         <strong>🧾 Riepilogo Preventivo</strong><br><br>
         📄 Pagine B/N: ${bn}<br>
         🎨 Pagine a colori: ${col}<br><br>
-        📦 Prezzo base: €${base.toFixed(2)} × ${copie} = <strong>€${costBase.toFixed(2)}</strong><br>
+        📦 Prezzo base: €${base.toFixed(2)} × ${copie} = €${costBase.toFixed(2)}<br>
         📘 Copertina: €${copVal.toFixed(2)} × ${copie} = €${costCop.toFixed(2)}<br>
         🖨️ Stampa B/N: €${(0.07+extraF).toFixed(2)} × ${bn} × ${copie} = €${costBN.toFixed(2)}<br>
         🎨 Stampa colori: €${(0.50+extraF).toFixed(2)} × ${col} × ${copie} = €${costCol.toFixed(2)}<br>
@@ -185,9 +184,4 @@
 
     function updateProgress(page, total, txt) {
       const pct = Math.round((page/total) * 100);
-      document.getElementById('progressBar').style.width = pct + '%';
-      document.getElementById('progressText').innerText = txt || `Pagina ${page} di ${total} (${pct}%)`;
-    }
-  </script>
-</body>
-</html>
+      document
