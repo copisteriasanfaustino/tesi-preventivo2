@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Preventivo Tesi</title>
+  <title>Preventivo Stampa Tesi</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.12.313/pdf.min.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -88,14 +88,10 @@
           <option value="0">Fronte/Retro</option>
         </select>
       </label>
-      <table class="checkbox-table" style="width:100%; border:none; margin-bottom:1em; border-collapse:collapse;">
+      <table class="checkbox-table" style="width:100%; margin-bottom:1em;">
         <tr>
-          <td style="padding:0; border:none; width:auto; vertical-align:middle;">
-            <input type="checkbox" id="dorso" />
-          </td>
-          <td style="padding:0 0 0 8px; border:none; text-align:left; vertical-align:middle;">
-            🏷️ Titolo sul dorso (+€6,50 per copia)
-          </td>
+          <td><input type="checkbox" id="dorso" /></td>
+          <td style="padding-left:8px;">🏷️ Titolo sul dorso (+€6,50 per copia)</td>
         </tr>
       </table>
       <button id="btnCalc">Calcola Preventivo</button>
@@ -183,4 +179,5 @@
       sendHeight();
     };
 
-    function updateProgress(page,
+    function updateProgress(page, total, txt) {
+      const pct = Math.round((page / total) * 100);
