@@ -104,6 +104,9 @@
   </div>
 
   <script>
+    pdfjsLib.GlobalWorkerOptions.workerSrc =
+      "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.12.313/pdf.worker.min.js";
+
     function sendHeight() {
       const h = document.body.scrollHeight;
       window.parent.postMessage({ type: "setHeight", height: h }, "*");
@@ -113,12 +116,10 @@
     window.addEventListener("resize", sendHeight);
     new MutationObserver(sendHeight).observe(document.body, { childList: true, subtree: true });
 
-    pdfjsLib.GlobalWorkerOptions.workerSrc =
-      "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.12.313/pdf.worker.min.js";
-
     document.getElementById("btnCalc").onclick = async () => {
       const f = document.getElementById("pdfFile");
       if (!f.files.length) return alert("Carica un file PDF.");
+
       const risultato = document.getElementById("risultato");
       risultato.style.display = "none";
       risultato.innerHTML = "";
@@ -168,12 +169,13 @@
         🎨 Pagine a colori: ${col}<br><br>
         📦 Prezzo base: €${base.toFixed(2)} × ${copie} = €${costBase.toFixed(2)}<br>
         📘 Copertina: €${copVal.toFixed(2)} × ${copie} = €${costCop.toFixed(2)}<br>
-        🖨️ Stampa B/N: €${(0.07+extraF).toFixed(2)} × ${bn} × ${copie} = €${costBN.toFixed(2)}<br>
-        🎨 Stampa colori: €${(0.50+extraF).toFixed(2)} × ${col} × ${copie} = €${costCol.toFixed(2)}<br>
+        🖨️ Stampa B/N: €${(0.07 + extraF).toFixed(2)} × ${bn} × ${copie} = €${costBN.toFixed(2)}<br>
+        🎨 Stampa colori: €${(0.50 + extraF).toFixed(2)} × ${col} × ${copie} = €${costCol.toFixed(2)}<br>
         ${hasDorso ? `🏷️ Dorso: €6,50 × ${copie} = €${costDr.toFixed(2)}<br>` : ""}
         <strong>💰 Totale: €${totalCost.toFixed(2)}</strong><br>
         <strong>📊 Per copia: €${perCopy.toFixed(2)}</strong>
       `;
+
       risultato.style.display = "block";
       document.getElementById("progressContainer").style.display = "none";
       sendHeight();
@@ -181,3 +183,9 @@
 
     function updateProgress(page, total, txt) {
       const pct = Math.round((page / total) * 100);
+      document.getElementById("progressBar").style.width = pct + "%";
+      document.getElementById("progressText").innerText = txt || `Pagina ${page} di ${total} (${pct}%)`;
+    }
+  </script>
+</body>
+</html>
